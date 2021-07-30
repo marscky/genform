@@ -79,6 +79,7 @@ async function fillTemplate (template, name, details) {
   switch (name) {
     case 'application':
       console.log(details.deadline);
+      doc.setTitle(`[RTSKHDA] [${details.meeting}] - Application`, { showInWindowTitleBar: true });
       drawTexts(page, name, [
         { type: 'meeting', text: details.meeting },
         { type: 'meetingDate', text: details.meetingDate },
@@ -97,6 +98,7 @@ async function fillTemplate (template, name, details) {
         applicantText += `Dr. ${applicants[i].name}\n`;
       }
       applicantText.trimRight();
+      doc.setTitle(`[RTSKHDA] [${details.meeting}] - Nomination`, { showInWindowTitleBar: true });
       drawTexts(page, name, [
         { type: 'meeting', text: details.meeting },
         { type: 'meetingDate', text: details.meetingDate },
@@ -118,6 +120,7 @@ async function fillTemplate (template, name, details) {
         applicantText += `Dr. ${applicants[i].name}, `;
       }
 
+      doc.setTitle(`[RTSKHDA] [${details.meeting}] - Memo`, { showInWindowTitleBar: true });
       drawTexts(page, name, [
         { type: 'from', text: closing.text },
         { type: 'to', text: details.companyName },
@@ -145,6 +148,8 @@ async function fillTemplate (template, name, details) {
       ];
 
       const uris = [];
+
+      doc.setTitle(`[RTSKHDA] [${details.meeting}] Offer - Dr. ${applicants[0].name}`, { showInWindowTitleBar: true });
       drawTexts(page, name, baseItems.concat({ type: 'applicant', text: `${applicants[0].name}` }));
       uris.push(doc.saveAsBase64({ dataUri: true }));
 
@@ -157,6 +162,7 @@ async function fillTemplate (template, name, details) {
           page1.setLineHeight(12.1);
           doc1.setAuthor(pdfAuthor);
           doc1.setCreator(pdfAuthor);
+          doc1.setTitle(`[RTSKHDA] [${details.meeting}] Offer - Dr. ${applicants[i].name}`, { showInWindowTitleBar: true });
 
           drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `${applicants[i].name}` }));
           uris.push(doc1.saveAsBase64({ dataUri: true }));
@@ -182,6 +188,8 @@ async function fillTemplate (template, name, details) {
       ];
 
       const uris = [];
+
+      doc.setTitle(`[RTSKHDA] [${details.meeting}] Annex - Dr. ${applicants[0].name}`, { showInWindowTitleBar: true });
       drawTexts(page, name, baseItems.concat({ type: 'applicant', text: `Dr. ${applicants[0].name}` }));
       uris.push(doc.saveAsBase64({ dataUri: true }));
 
@@ -192,6 +200,9 @@ async function fillTemplate (template, name, details) {
           const page1 = doc1.getPages()[0];
           page1.setFontSize(11);
           page1.setLineHeight(12.1);
+          doc1.setAuthor(pdfAuthor);
+          doc1.setCreator(pdfAuthor);
+          doc1.setTitle(`[RTSKHDA] [${details.meeting}] Annex - Dr. ${applicants[i].name}`, { showInWindowTitleBar: true });
           drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `Dr. ${applicants[i].name}` }));
           uris.push(doc1.saveAsBase64({ dataUri: true }));
         }
