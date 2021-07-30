@@ -1,10 +1,13 @@
 <template>
-  <div>
+  <section>
     <a class="button button-outline" @click="$emit('toEdit')">edit again</a>
     <section v-for="(name, i) in ['application', 'nomination', 'memo', 'offer', 'annex']" :key="i">
       <h4 class="heading">{{ name }}</h4>
+      <div v-if="errors[name]">
+        <p>Missing fields: <code v-for="param in errors[name]" :key="param">{{param}}</code></p>
+      </div>
       <iframe
-        v-if="name === 'application' || name === 'nomination' || name === 'memo'"
+        v-else-if="name === 'application' || name === 'nomination' || name === 'memo'"
         width="100%" height="300px" :src="docs[name]"></iframe>
       <template v-else>
         <div v-for="(uri, key) in docs[name]" :key="key">
@@ -14,11 +17,12 @@
       </template>
       <hr>
     </section>
-  </div>
+  </section>
 </template>
 
 <script>
 import { loadPDF, fillTemplate } from '../utils/pdf';
+import allRequired from '../utils/allrequired';
 
 export default {
   name: 'Generate',
@@ -27,7 +31,8 @@ export default {
     return {
       isTemplateReady: false,
       templates: {},
-      docs: {}
+      docs: {},
+      errors: {}
     };
   },
   methods: {
@@ -39,21 +44,35 @@ export default {
         return false;
       }
 
-      fillTemplate(vm.templates.application, 'application', details).then(uri => { vm.docs.application = uri; });
-      fillTemplate(vm.templates.nomination, 'nomination', details).then(uri => { vm.docs.nomination = uri; });
-      fillTemplate(vm.templates.memo, 'memo', details).then(uri => { vm.docs.memo = uri; });
-      fillTemplate(vm.templates.offer, 'offer', details).then(uris => {
-        vm.docs.offer = {};
-        for (let i = 0; i < details.applicants.length; i++) {
-          vm.docs.offer[details.applicants[i].name] = uris[i];
-        }
-      });
-      fillTemplate(vm.templates.annex, 'annex', details).then(uris => {
-        vm.docs.annex = {};
-        for (let i = 0; i < details.applicants.length; i++) {
-          vm.docs.annex[details.applicants[i].name] = uris[i];
-        }
-      });
+      if (!(vm.errors.application = allRequired(details, ['meeting', 'meetingDate', 'quota', 'deadline', 'councilMember', 'councilPost', 'openApplicationDate']))) {
+        fillTemplate(vm.templates.application, 'application', details).then(uri => { vm.docs.application = uri; });
+      }
+
+      if (!(vm.errors.nomination = allRequired(details, ['applicants', 'meeting', 'meetingDate', 'quota', 'deadline', 'resultAnnouncementDate', 'councilMember', 'councilPost']))) {
+        fillTemplate(vm.templates.nomination, 'nomination', details).then(uri => { vm.docs.nomination = uri; });
+      }
+
+      if (!(vm.errors.memo = allRequired(details, ['applicants', 'meeting', 'meetingDate', 'resultAnnouncementDate', 'councilMember', 'councilPost', 'companyContact', 'companyName']))) {
+        fillTemplate(vm.templates.memo, 'memo', details).then(uri => { vm.docs.memo = uri; });
+      }
+
+      if (!(vm.errors.offer = allRequired(details, ['applicants', 'meeting', 'meetingDate', 'resultAnnouncementDate', 'councilPost', 'councilMember', 'sponsorship', 'companyName']))) {
+        fillTemplate(vm.templates.offer, 'offer', details).then(uris => {
+          vm.docs.offer = {};
+          for (let i = 0; i < details.applicants.length; i++) {
+            vm.docs.offer[details.applicants[i].name] = uris[i];
+          }
+        });
+      }
+
+      if (!(vm.errors.annex = allRequired(details, ['applicants', 'meeting', 'meetingDate', 'resultAnnouncementDate', 'councilPost', 'councilMember', 'companyName']))) {
+        fillTemplate(vm.templates.annex, 'annex', details).then(uris => {
+          vm.docs.annex = {};
+          for (let i = 0; i < details.applicants.length; i++) {
+            vm.docs.annex[details.applicants[i].name] = uris[i];
+          }
+        });
+      }
     }
   },
   created () {
@@ -72,8 +91,12 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 iframe {
   border: 3px solid #efefef;
+}
+
+p {
+  overflow-wrap: anywhere;
 }
 </style>

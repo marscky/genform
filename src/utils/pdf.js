@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { PDFDocument } from 'pdf-lib';
 
+const pdfAuthor = 'genform with pdf-lib';
 const drawTextOptions = {
   application: {
     meeting: { x: 177.98, y: 703.65 },
@@ -67,7 +68,9 @@ async function fillTemplate (template, name, details) {
   const page = doc.getPages()[0];
   page.setFontSize(11);
   page.setLineHeight(12.1);
-
+  doc.setAuthor(pdfAuthor);
+  doc.setCreator(pdfAuthor);
+  
   const closing = {
     type: 'closing',
     text: `Dr. ${details.councilMember}\n${details.councilPost}\nRTSKHDA\nSession ${details.councilSession}`
@@ -152,6 +155,9 @@ async function fillTemplate (template, name, details) {
           const page1 = doc1.getPages()[0];
           page1.setFontSize(11);
           page1.setLineHeight(12.1);
+          doc1.setAuthor(pdfAuthor);
+          doc1.setCreator(pdfAuthor);
+
           drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `${applicants[i].name}` }));
           uris.push(doc1.saveAsBase64({ dataUri: true }));
         }
