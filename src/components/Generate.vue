@@ -1,36 +1,52 @@
 <template>
   <div>
-    <a class="button" @click="generate()">download all</a>
-    <iframe :src="uris[0]"></iframe>
+    <section v-for="name in ['application', 'nomination', 'memo']">
+      <h4>{{ name }}</h4>
+      <iframe width="100%" height="300px" :src="docs[name]"></iframe>
+    </section>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import { loadPDF, fillTemplate } from '../utils/pdf';
 import { PDFDocument } from 'pdf-lib';
 
 export default {
   name: 'Generate',
-  props: ['uris'],
+  props: [],
   data () {
     return {
-      docs: {},
-      output: {}
+      isTemplateReady: false,
+      templates: {},
+      docs: {}
     };
   },
   methods: {
-    loadPDF (name) {
-      const $vm = this;
-      axios.get(`./templates/${name}.pdf`, { responseType: 'arraybuffer' })
-        .then(response => PDFDocument.load(response.data))
-        .then(doc => $vm.docs[name] = doc)
-        .catch(error => console.error(error));
-    },
-    generate () {
+    genpdf (details) {
+      const vm = this;
+      if (!vm.isTemplateReady) {
+        alert('Templates not yet loaded. Try again.');
+        return false;
+      }
+
+      fillTemplate(vm.templates.application, 'application', details).then(uri => { vm.docs.application = uri; });
+      fillTemplate(vm.templates.nomination, 'nomination', details).then(uri => { vm.docs.nomination = uri; });
+      fillTemplate(vm.templates.memo, 'memo', details).then(uri => { vm.docs.memo = uri; });
     }
   },
-  beforeMount () {
-      }
+  created () {
+    const vm = this;
+    const names = ['application', 'nomination', 'offer', 'memo', 'annex'];
+    Promise.all(names.map(name => loadPDF(name)))
+      .then(data => {
+        data.forEach((buffer, i) => { vm.templates[names[i]] = buffer; });
+        vm.isTemplateReady = true;
+      })
+      .catch(e => {
+        console.error(e.message);
+        alert('Something went wrong!');
+      });
+  }
 };
 </script>
 
