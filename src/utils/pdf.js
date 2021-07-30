@@ -68,9 +68,11 @@ async function fillTemplate (template, name, details) {
   const page = doc.getPages()[0];
   page.setFontSize(11);
   page.setLineHeight(12.1);
+
+  let title;
   doc.setAuthor(pdfAuthor);
   doc.setCreator(pdfAuthor);
-  
+
   const closing = {
     type: 'closing',
     text: `Dr. ${details.councilMember}\n${details.councilPost}\nRTSKHDA\nSession ${details.councilSession}`
@@ -79,7 +81,8 @@ async function fillTemplate (template, name, details) {
   switch (name) {
     case 'application':
       console.log(details.deadline);
-      doc.setTitle(`[RTSKHDA] [${details.meeting}] - Application`, { showInWindowTitleBar: true });
+      title = `[RTSKHDA] [${details.meeting}] - Application`;
+      doc.setTitle(title, { showInWindowTitleBar: true });
       drawTexts(page, name, [
         { type: 'meeting', text: details.meeting },
         { type: 'meetingDate', text: details.meetingDate },
@@ -98,7 +101,10 @@ async function fillTemplate (template, name, details) {
         applicantText += `Dr. ${applicants[i].name}\n`;
       }
       applicantText.trimRight();
-      doc.setTitle(`[RTSKHDA] [${details.meeting}] - Nomination`, { showInWindowTitleBar: true });
+
+      title = `[RTSKHDA] [${details.meeting}] - Nomination`;
+      doc.setTitle(title, { showInWindowTitleBar: true });
+
       drawTexts(page, name, [
         { type: 'meeting', text: details.meeting },
         { type: 'meetingDate', text: details.meetingDate },
@@ -120,7 +126,9 @@ async function fillTemplate (template, name, details) {
         applicantText += `Dr. ${applicants[i].name}, `;
       }
 
-      doc.setTitle(`[RTSKHDA] [${details.meeting}] - Memo`, { showInWindowTitleBar: true });
+      title = `[RTSKHDA] [${details.meeting}] - Memo`;
+      doc.setTitle(title, { showInWindowTitleBar: true });
+
       drawTexts(page, name, [
         { type: 'from', text: closing.text },
         { type: 'to', text: details.companyName },
@@ -147,11 +155,14 @@ async function fillTemplate (template, name, details) {
         closing
       ];
 
+      const titles = [];
       const uris = [];
 
-      doc.setTitle(`[RTSKHDA] [${details.meeting}] Offer - Dr. ${applicants[0].name}`, { showInWindowTitleBar: true });
+      title = `[RTSKHDA] [${details.meeting}] Offer - Dr. ${applicants[0].name}`;
+      doc.setTitle(title, { showInWindowTitleBar: true });
       drawTexts(page, name, baseItems.concat({ type: 'applicant', text: `${applicants[0].name}` }));
       uris.push(doc.saveAsBase64({ dataUri: true }));
+      titles.push(title);
 
       if (len > 1) {
         for (let i = 1; i < len; i++) {
@@ -162,14 +173,28 @@ async function fillTemplate (template, name, details) {
           page1.setLineHeight(12.1);
           doc1.setAuthor(pdfAuthor);
           doc1.setCreator(pdfAuthor);
-          doc1.setTitle(`[RTSKHDA] [${details.meeting}] Offer - Dr. ${applicants[i].name}`, { showInWindowTitleBar: true });
+
+          let title1 = `[RTSKHDA] [${details.meeting}] Offer - Dr. ${applicants[i].name}`;
+          titles.push(title1);
+          doc1.setTitle(title1, { showInWindowTitleBar: true });
 
           drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `${applicants[i].name}` }));
+          // uris.push(Promise.resolve({ title1, uri: doc1.saveAsBase64({ dataUri: true }) }));
           uris.push(doc1.saveAsBase64({ dataUri: true }));
         }
       }
 
-      return Promise.all(uris);
+      return Promise.all(uris).then(d => {
+        const res = [];
+        d.forEach((uri, i) => {
+          res.push({
+            applicant: applicants[i].name,
+            title: titles[i],
+            uri
+          });
+        });
+        return res;
+      });
     }
 
     case 'annex': {
@@ -186,12 +211,15 @@ async function fillTemplate (template, name, details) {
         { type: 'resultAnnouncementDate', text: details.resultAnnouncementDate },
         { type: 'closing', text: `Dr. ${details.councilMember}\n${details.councilPost}` }
       ];
-
+    
+      const titles = [];
       const uris = [];
 
-      doc.setTitle(`[RTSKHDA] [${details.meeting}] Annex - Dr. ${applicants[0].name}`, { showInWindowTitleBar: true });
+      title = `[RTSKHDA] [${details.meeting}] Annex - Dr. ${applicants[0].name}`;
+      doc.setTitle(title, { showInWindowTitleBar: true });
       drawTexts(page, name, baseItems.concat({ type: 'applicant', text: `Dr. ${applicants[0].name}` }));
       uris.push(doc.saveAsBase64({ dataUri: true }));
+      titles.push(title);
 
       if (len > 1) {
         for (let i = 1; i < len; i++) {
@@ -202,17 +230,30 @@ async function fillTemplate (template, name, details) {
           page1.setLineHeight(12.1);
           doc1.setAuthor(pdfAuthor);
           doc1.setCreator(pdfAuthor);
-          doc1.setTitle(`[RTSKHDA] [${details.meeting}] Annex - Dr. ${applicants[i].name}`, { showInWindowTitleBar: true });
+
+          let title1 = `[RTSKHDA] [${details.meeting}] Annex - Dr. ${applicants[i].name}`;
+          titles.push(title1);
+          doc1.setTitle(title1, { showInWindowTitleBar: true });
           drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `Dr. ${applicants[i].name}` }));
           uris.push(doc1.saveAsBase64({ dataUri: true }));
         }
       }
 
-      return Promise.all(uris);
+      return Promise.all(uris).then(d => {
+        const res = [];
+        d.forEach((uri, i) => {
+          res.push({
+            applicant: applicants[i].name,
+            title: titles[i],
+            uri
+          });
+        });
+        return res;
+      });
     }
   }
 
-  return doc.saveAsBase64({ dataUri: true });
+  return Promise.resolve({ title , uri: doc.saveAsBase64({ dataUri: true }) });
 }
 
 export { loadPDF, fillTemplate };
