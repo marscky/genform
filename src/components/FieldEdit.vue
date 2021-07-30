@@ -27,7 +27,7 @@
       <button
         type="button"
         class="button button-clear"
-        :class="{ disabled: quota === 1 }"
+        :class="{ disabled: quota == 1 }"
         @click="updateQuota(-1)">
         <i data-feather="minus-circle"></i>
       </button>
@@ -67,7 +67,8 @@
         field-display-name="Name" field-type="text"></field-input>
       <field-input
         v-model.trim="applicants[i].department" :field-name="`department-${i}`"
-        field-display-name="Department" field-type="text"></field-input>
+        field-display-name="Department" field-type="select"
+        :field-options="['Medicine and Geriatrics', 'Department of Surgery']"></field-input>
       <hr>
     </template>
 
@@ -96,7 +97,7 @@ export default {
       resultAnnouncementDate: '',
       companyName: '',
       companyContact: '',
-      applicants: [{}]
+      applicants: [{ department: 'Medicine and Geriatrics' }]
     };
   },
   computed: {
@@ -104,7 +105,7 @@ export default {
       const _applicants = [];
       this.applicants.forEach(a => {
         // do not add empty applicants
-        if (a.name || a.department) {
+        if (a.name) {
           _applicants.push({ name: a.name, department: a.department });
         }
       });
@@ -133,7 +134,7 @@ export default {
     updateQuota (delta) {
       if (delta >= 1) {
         for (let i = 1; i <= delta; i++) {
-          this.applicants.push({});
+          this.applicants.push({ department: 'Medicine and Geriatrics' });
         }
       } else if (delta <= -1) {
         const newQuota = this.quota + delta;
@@ -144,12 +145,9 @@ export default {
         }
 
         for (let i = applicants.length - 1; i >= newQuota; i--) {
-          const values = Object.values(applicants[i]);
-          for (let j = 0; j < values.length; j++) {
-            if (values[j]) {
-              alert('Existing data!\nClear out the fields first.');
-              return false;
-            }
+          if (applicants[i].name) {
+            alert('Existing data!\nClear out the fields first.');
+            return false;
           }
         }
 
@@ -166,7 +164,7 @@ export default {
     if (localStorage.meeting) {
       this.meeting = localStorage.meeting;
     }
-    
+
     if (localStorage.meetingDate) {
       this.meetingDate = localStorage.meetingDate;
     }
@@ -174,7 +172,7 @@ export default {
     if (localStorage.sponsorship) {
       this.sponsorship = localStorage.sponsorship;
     }
- 
+
     if (localStorage.councilMember) {
       this.councilMember = localStorage.councilMember;
     }
@@ -200,13 +198,13 @@ export default {
     }
 
     if (localStorage.quota) {
-      this.quota = localStorage.quota;
+      this.quota = +localStorage.quota;
     }
 
     if (localStorage.applicants) {
       const applicants = JSON.parse(localStorage.applicants);
       while (applicants.length < this.quota) {
-        applicants.push({});
+        applicants.push({ department: 'Medicine and Geriatrics' });
       }
       this.applicants = applicants;
     }
@@ -276,6 +274,10 @@ h4 {
 input[disabled],
 .disabled {
   cursor: not-allowed;
+}
+
+.disabled {
+  opacity: 0.5;
 }
 
 .applicant-heading {
