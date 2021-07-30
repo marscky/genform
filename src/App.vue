@@ -32,6 +32,7 @@ export default {
     onGenerate (fields) {
       this.$refs.generate.genpdf(fields);
       this.view = 'generate';
+      window.scrollTo(0, 0);
     }
   },
   components: {
