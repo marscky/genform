@@ -82,9 +82,6 @@ import { session, today, toDMY } from '../utils/date';
 
 export default {
   name: 'FieldEdit',
-  mounted () {
-    feather.replace();
-  },
   data () {
     return {
       meeting: '',
@@ -134,10 +131,12 @@ export default {
       this.$emit('generate', this.details);
     },
     updateQuota (delta) {
-      if (delta === 1) {
-        this.applicants.push({});
-      } else if (delta === -1) {
-        const newQuota = this.quota - 1;
+      if (delta >= 1) {
+        for (let i = 1; i <= delta; i++) {
+          this.applicants.push({});
+        }
+      } else if (delta <= -1) {
+        const newQuota = this.quota + delta;
         const { applicants } = this;
 
         if (newQuota === 0) {
@@ -159,6 +158,96 @@ export default {
 
       this.quota = this.applicants.length;
       return true;
+    }
+  },
+  mounted () {
+    feather.replace();
+
+    if (localStorage.meeting) {
+      this.meeting = localStorage.meeting;
+    }
+    
+    if (localStorage.meetingDate) {
+      this.meetingDate = localStorage.meetingDate;
+    }
+
+    if (localStorage.sponsorship) {
+      this.sponsorship = localStorage.sponsorship;
+    }
+ 
+    if (localStorage.councilMember) {
+      this.councilMember = localStorage.councilMember;
+    }
+
+    if (localStorage.councilPost) {
+      this.councilPost = localStorage.councilPost;
+    }
+
+    if (localStorage.deadline) {
+      this.deadline = localStorage.deadline;
+    }
+
+    if (localStorage.resultAnnouncementDate) {
+      this.resultAnnouncementDate = localStorage.resultAnnouncementDate;
+    }
+
+    if (localStorage.companyName) {
+      this.companyName = localStorage.companyName;
+    }
+
+    if (localStorage.companyContact) {
+      this.companyContact = localStorage.companyContact;
+    }
+
+    if (localStorage.quota) {
+      this.quota = localStorage.quota;
+    }
+
+    if (localStorage.applicants) {
+      const applicants = JSON.parse(localStorage.applicants);
+      while (applicants.length < this.quota) {
+        applicants.push({});
+      }
+      this.applicants = applicants;
+    }
+
+    this.$watch('details.applicants', n => {
+      localStorage.applicants = JSON.stringify(n);
+    });
+  },
+  watch: {
+    meeting (n) {
+      localStorage.meeting = n;
+    },
+    meetingDate (n) {
+      localStorage.meetingDate = n;
+    },
+    sponsorship (n) {
+      localStorage.sponsorship = n;
+    },
+    quota (n) {
+      localStorage.quota = n;
+    },
+    councilMember (n) {
+      localStorage.councilMember = n;
+    },
+    councilPost (n) {
+      localStorage.councilPost = n;
+    },
+    openApplicationDate (n) {
+      localStorage.openApplicationDate = n;
+    },
+    deadline (n) {
+      localStorage.deadline = n;
+    },
+    resultAnnouncementDate (n) {
+      localStorage.resultAnnouncementDate = n;
+    },
+    companyName (n) {
+      localStorage.companyName = n;
+    },
+    companyContact (n) {
+      localStorage.companyContact = n;
     }
   },
   components: {

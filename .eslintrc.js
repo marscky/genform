@@ -17,7 +17,7 @@ module.exports = {
     'space-before-function-paren': ['error', 'always'],
     'no-plusplus': ['error', { 'allowForLoopAfterthoughts': true }],
     'arrow-parens': ['error', 'as-needed'],
-    'no-underscore-dangle': 'off'
+    'no-underscore-dangle': 'off',
     'no-alert': 'off'
   }
 };
