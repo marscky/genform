@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h4>Who is creating the form?</h4>
+    <h4 class="heading">Who is creating the form?</h4>
     <field-input
       v-model.trim="councilMember" field-name="council-member"
       field-display-name="Council member" field-type="text"></field-input>
@@ -12,7 +12,7 @@
       v-model.trim="councilSession" field-name="council-session"
       field-display-name="Session" disabled></field-input>
 
-    <h4>Meeting details</h4>
+    <h4 class="heading">Meeting details</h4>
     <field-input
       v-model.trim="meeting" field-name="meeting"
       field-display-name="Meeting" field-type="text"></field-input>
@@ -40,7 +40,7 @@
       </button>
     </div>
 
-    <h4>Sponsoring company</h4>
+    <h4 class="heading">Sponsoring company</h4>
     <field-input
       v-model.trim="companyName" field-name="company-name"
       field-display-name="Company name" field-type="text"></field-input>
@@ -48,7 +48,7 @@
       v-model.trim="companyContact" field-name="company-contact"
       field-display-name="Company contact person" field-type="text"></field-input>
 
-    <h4>Important dates</h4>
+    <h4 class="heading">Important dates</h4>
     <field-input
       v-model="openApplicationDate" field-name="open-application-date"
       field-display-name="Open application date" field-type="date"></field-input>
@@ -59,7 +59,7 @@
       v-model="resultAnnouncementDate" field-name="result-announcement-date"
       field-display-name="Result announcement date" field-type="date"></field-input>
 
-    <h4>Applicants</h4>
+    <h4 class="heading">Applicants</h4>
     <template v-for="(applicant, i) in applicants" :key="i">
       <h5 class="applicant-heading">Applicant {{ i + 1 }}</h5>
       <field-input
@@ -254,8 +254,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-h4 {
+<style lang="scss">
+.heading {
   margin-top: 2rem;
 }
 

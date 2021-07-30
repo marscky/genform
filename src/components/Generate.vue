@@ -1,15 +1,16 @@
 <template>
   <div>
-    <section v-for="name in ['application', 'nomination', 'memo']">
-      <h4>{{ name }}</h4>
+    <a class="button button-outline" @click="$emit('toEdit')">edit again</a>
+    <section v-for="(name, i) in ['application', 'nomination', 'memo']" :key="i">
+      <h4 class="heading">{{ name }}</h4>
       <iframe width="100%" height="300px" :src="docs[name]"></iframe>
+      <hr>
     </section>
   </div>
 </template>
 
 <script>
 import { loadPDF, fillTemplate } from '../utils/pdf';
-import { PDFDocument } from 'pdf-lib';
 
 export default {
   name: 'Generate',
@@ -51,4 +52,7 @@ export default {
 </script>
 
 <style lang="scss">
+iframe {
+  border: 3px solid #efefef;
+}
 </style>

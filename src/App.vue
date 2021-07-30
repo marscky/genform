@@ -5,8 +5,8 @@
    </div>
   </header>
   <main class="container">
-    <field-edit @generate="onGenerate"></field-edit>
-    <generate ref="generate"></generate>
+    <field-edit v-show="view === 'edit'" @generate="onGenerate"></field-edit>
+    <generate v-show="view === 'generate'" @toEdit="toEdit" ref="generate"></generate>
   </main>
 </template>
 
@@ -26,8 +26,12 @@ export default {
     };
   },
   methods: {
+    toEdit () {
+      this.view = 'edit';
+    },
     onGenerate (fields) {
       this.$refs.generate.genpdf(fields);
+      this.view = 'generate';
     }
   },
   components: {
