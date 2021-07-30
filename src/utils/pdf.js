@@ -25,7 +25,7 @@ const drawTextOptions = {
   },
   offer: {
     applicant: { x: 206.5, y: 703.41 },
-    sponsoringCompany: { x: 205.5 , y: 678.09 },
+    sponsoringCompany: { x: 205.5, y: 678.09 },
     meeting: { x: 206.5, y: 653.3 },
     meetingDate: { x: 206.5, y: 627.97 },
     sponsorship: { x: 206.5, y: 602.71 },
@@ -87,7 +87,7 @@ async function fillTemplate (template, name, details) {
       ]);
       break;
 
-    case 'nomination':
+    case 'nomination': {
       const applicants = details.applicants;
       let applicantText = '';
       for (let i = 0; i < applicants.length; i++) {
@@ -106,7 +106,7 @@ async function fillTemplate (template, name, details) {
         closing
       ]);
       break;
-
+    }
 
     case 'memo': {
       const applicants = details.applicants;
@@ -123,6 +123,75 @@ async function fillTemplate (template, name, details) {
         { type: 'body', text: `Dear Sir/Madam,\n \nOur association would like to nominate ${applicantText.slice(0, -2)} for ${details.meeting} on ${details.meetingDate}.\n \nThank you for your continuous support.\n \nBest regards,\n \n \n \n${closing.text}` }
       ]);
       break;
+    }
+
+    case 'offer': {
+      const { applicants } = details;
+      const len = applicants.length;
+      if (len === 0) {
+        return [];
+      }
+
+      const baseItems = [
+        { type: 'sponsoringCompany', text: details.companyName },
+        { type: 'meeting', text: details.meeting },
+        { type: 'meetingDate', text: details.meetingDate },
+        { type: 'sponsorship', text: details.sponsorship },
+        { type: 'resultAnnouncementDate', text: details.resultAnnouncementDate },
+        closing
+      ];
+
+      const uris = [];
+      drawTexts(page, name, baseItems.concat({ type: 'applicant', text: `${applicants[0].name}` }));
+      uris.push(doc.saveAsBase64({ dataUri: true }));
+
+      if (len > 1) {
+        for (let i = 1; i < len; i++) {
+          /* eslint-disable no-await-in-loop */
+          const doc1 = await PDFDocument.load(template);
+          const page1 = doc1.getPages()[0];
+          page1.setFontSize(11);
+          page1.setLineHeight(12.1);
+          drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `${applicants[i].name}` }));
+          uris.push(doc1.saveAsBase64({ dataUri: true }));
+        }
+      }
+
+      return Promise.all(uris);
+    }
+
+    case 'annex': {
+      const { applicants } = details;
+      const len = applicants.length;
+      if (len === 0) {
+        return [];
+      }
+
+      const baseItems = [
+        { type: 'meeting', text: details.meeting },
+        { type: 'meetingDate', text: details.meetingDate },
+        { type: 'sponsoringCompany', text: details.companyName },
+        { type: 'resultAnnouncementDate', text: details.resultAnnouncementDate },
+        { type: 'closing', text: `Dr. ${details.councilMember}\n${details.councilPost}` }
+      ];
+
+      const uris = [];
+      drawTexts(page, name, baseItems.concat({ type: 'applicant', text: `Dr. ${applicants[0].name}` }));
+      uris.push(doc.saveAsBase64({ dataUri: true }));
+
+      if (len > 1) {
+        for (let i = 1; i < len; i++) {
+          /* eslint-disable no-await-in-loop */
+          const doc1 = await PDFDocument.load(template);
+          const page1 = doc1.getPages()[0];
+          page1.setFontSize(11);
+          page1.setLineHeight(12.1);
+          drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `Dr. ${applicants[i].name}` }));
+          uris.push(doc1.saveAsBase64({ dataUri: true }));
+        }
+      }
+
+      return Promise.all(uris);
     }
   }
 
