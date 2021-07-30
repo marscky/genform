@@ -25,7 +25,7 @@ const drawTextOptions = {
   },
   offer: {
     applicant: { x: 206.5, y: 703.41 },
-    sponsoringCompany: { x: 205.5, y: 678.09 },
+    sponsoringCompany: { x: 205.5, y: 678.09, maxWidth: 260 },
     meeting: { x: 206.5, y: 653.3 },
     meetingDate: { x: 206.5, y: 627.97 },
     sponsorship: { x: 206.5, y: 602.71 },
@@ -34,7 +34,7 @@ const drawTextOptions = {
   },
   memo: {
     from: { x: 61.56, y: 638.39, lineHeight: 13 },
-    to: { x: 293.13 , y: 638.39 },
+    to: { x: 293.13, y: 638.39, maxWidth: 232 },
     resultAnnouncementDate: { x: 99.98, y: 573.47 },
     companyContact: { x: 333.25, y: 573.47 },
     body: { x: 61.32, y: 524.9, lineHeight: 17, maxWidth: 476.57 }
