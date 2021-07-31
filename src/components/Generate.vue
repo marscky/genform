@@ -1,7 +1,9 @@
 <template>
   <section>
     <a class="button button-outline" @click="$emit('toEdit')">edit again</a>
-    <section class="doc-section" v-for="(name, i) in ['application', 'nomination', 'memo', 'offer', 'annex']" :key="i">
+    <section class="doc-section"
+      v-for="(name, i) in ['application', 'nomination', 'memo', 'offer', 'annex']"
+      :key="i">
       <h4 class="heading">{{ name }}</h4>
       <p v-if="errors[name]">
       Missing fields: <code v-for="param in errors[name]" :key="param">{{param}}</code>
