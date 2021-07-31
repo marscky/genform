@@ -1,11 +1,11 @@
 <template>
   <section>
     <a class="button button-outline" @click="$emit('toEdit')">edit again</a>
-    <section v-for="(name, i) in ['application', 'nomination', 'memo', 'offer', 'annex']" :key="i">
+    <section class="doc-section" v-for="(name, i) in ['application', 'nomination', 'memo', 'offer', 'annex']" :key="i">
       <h4 class="heading">{{ name }}</h4>
-      <div v-if="errors[name]">
-        <p>Missing fields: <code v-for="param in errors[name]" :key="param">{{param}}</code></p>
-      </div>
+      <p v-if="errors[name]">
+      Missing fields: <code v-for="param in errors[name]" :key="param">{{param}}</code>
+      </p>
       <template v-else-if="name === 'application' || name === 'nomination' || name === 'memo'">
         <a class="button"
           :download="docs[name] && docs[name].title + '.pdf'"
@@ -123,8 +123,8 @@ iframe {
   margin-bottom: 0.8rem;
 }
 
-p {
-  overflow-wrap: anywhere;
+.doc-section {
+  word-break: break-all;
 }
 
 strong {
