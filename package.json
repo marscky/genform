@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "downloadjs": "^1.4.7",
     "feather-icons": "^4.28.0",
     "milligram": "^1.4.1",
     "normalize.css": "^8.0.1",

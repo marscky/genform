@@ -161,7 +161,7 @@ async function fillTemplate (template, name, details) {
       title = `[RTSKHDA] [${details.meeting}] Offer - Dr. ${applicants[0].name}`;
       doc.setTitle(title, { showInWindowTitleBar: true });
       drawTexts(page, name, baseItems.concat({ type: 'applicant', text: `${applicants[0].name}` }));
-      uris.push(doc.saveAsBase64({ dataUri: true }));
+      uris.push(doc.save());
       titles.push(title);
 
       if (len > 1) {
@@ -179,8 +179,7 @@ async function fillTemplate (template, name, details) {
           doc1.setTitle(title1, { showInWindowTitleBar: true });
 
           drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `${applicants[i].name}` }));
-          // uris.push(Promise.resolve({ title1, uri: doc1.saveAsBase64({ dataUri: true }) }));
-          uris.push(doc1.saveAsBase64({ dataUri: true }));
+          uris.push(doc1.save());
         }
       }
 
@@ -190,7 +189,7 @@ async function fillTemplate (template, name, details) {
           res.push({
             applicant: applicants[i].name,
             title: titles[i],
-            uri
+            pdf: uri
           });
         });
         return res;
@@ -211,14 +210,14 @@ async function fillTemplate (template, name, details) {
         { type: 'resultAnnouncementDate', text: details.resultAnnouncementDate },
         { type: 'closing', text: `Dr. ${details.councilMember}\n${details.councilPost}` }
       ];
-    
+
       const titles = [];
       const uris = [];
 
       title = `[RTSKHDA] [${details.meeting}] Annex - Dr. ${applicants[0].name}`;
       doc.setTitle(title, { showInWindowTitleBar: true });
       drawTexts(page, name, baseItems.concat({ type: 'applicant', text: `Dr. ${applicants[0].name}` }));
-      uris.push(doc.saveAsBase64({ dataUri: true }));
+      uris.push(doc.save());
       titles.push(title);
 
       if (len > 1) {
@@ -235,7 +234,7 @@ async function fillTemplate (template, name, details) {
           titles.push(title1);
           doc1.setTitle(title1, { showInWindowTitleBar: true });
           drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `Dr. ${applicants[i].name}` }));
-          uris.push(doc1.saveAsBase64({ dataUri: true }));
+          uris.push(doc1.save());
         }
       }
 
@@ -245,7 +244,7 @@ async function fillTemplate (template, name, details) {
           res.push({
             applicant: applicants[i].name,
             title: titles[i],
-            uri
+            pdf: uri
           });
         });
         return res;
@@ -253,7 +252,33 @@ async function fillTemplate (template, name, details) {
     }
   }
 
-  return Promise.resolve({ title , uri: doc.saveAsBase64({ dataUri: true }) });
+  return Promise.resolve({ title, pdf: doc.save() });
 }
 
-export { loadPDF, fillTemplate };
+/* taken from pdf-lib source */
+function toBase64 (bytes) {
+  /* eslint-disable no-bitwise, prefer-template */
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  let base64 = '';
+  const len = bytes.length;
+  for (let i = 0; i < len; i += 3) {
+    base64 += chars[bytes[i] >> 2];
+    base64 += chars[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
+    base64 += chars[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
+    base64 += chars[bytes[i + 2] & 63];
+  }
+
+  if (len % 3 === 2) {
+    base64 = base64.substring(0, base64.length - 1) + '=';
+  } else if (len % 3 === 1) {
+    base64 = base64.substring(0, base64.length - 2) + '==';
+  }
+
+  return base64;
+}
+
+function pdfToUri (input) {
+  return `data:application/pdf;base64,${toBase64(input)}`;
+}
+
+export { loadPDF, fillTemplate, pdfToUri };

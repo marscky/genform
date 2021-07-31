@@ -8,18 +8,18 @@
       <p v-if="errors[name]">
       Missing fields: <code v-for="param in errors[name]" :key="param">{{param}}</code>
       </p>
-      <template v-else-if="name === 'application' || name === 'nomination' || name === 'memo'">
+      <template v-else-if="(name === 'application' || name === 'nomination' || name === 'memo') && docs[name]">
         <a class="button"
-          :download="docs[name] && docs[name].title + '.pdf'"
-          :href="docs[name] && docs[name].uri">download</a>
+           @click="download(docs[name].pdf, docs[name].title + '.pdf', 'application/pdf')"
+           >download</a>
         <iframe width="100%" height="300px" :src="docs[name] && docs[name].uri"></iframe>
       </template>
-      <template v-else>
+      <template v-else-if="(name === 'offer' || name === 'annex') && docs[name]">
         <div v-for="(item, key) in docs[name]" :key="key">
           <strong>Dr. {{ item.applicant }} </strong>
           <a class="button"
-            :download="item.title + '.pdf'"
-            :href="item.uri">download</a>
+            @click="download(item.pdf, item.title + '.pdf', 'application/pdf')"
+            >download</a>
           <iframe width="100%" height="300px" :src="item.uri"></iframe>
         </div>
       </template>
@@ -29,7 +29,8 @@
 </template>
 
 <script>
-import { loadPDF, fillTemplate } from '../utils/pdf';
+import downloadjs from 'downloadjs';
+import { loadPDF, fillTemplate, pdfToUri } from '../utils/pdf';
 import allRequired from '../utils/allrequired';
 
 export default {
@@ -40,11 +41,16 @@ export default {
       isTemplateReady: false,
       templates: {},
       docs: {},
-      errors: {}
+      errors: {},
+      objectURL: []
     };
   },
   methods: {
-    /* eslint-disable consistent-return */
+    /* eslint-disable consistent-return, no-cond-assign */
+    download (data, title, mimetype) {
+      console.log(downloadjs);
+      downloadjs(data, title, mimetype);
+    },
     genpdf (details) {
       const vm = this;
       if (!vm.isTemplateReady) {
@@ -56,8 +62,9 @@ export default {
         fillTemplate(vm.templates.application, 'application', details)
           .then(res => {
             vm.docs.application = {};
-            res.uri.then(uri => {
-              vm.docs.application.uri = uri;
+            res.pdf.then(pdf => {
+              vm.docs.application.uri = pdfToUri(pdf);
+              vm.docs.application.pdf = pdf;
               vm.docs.application.title = res.title;
             });
           });
@@ -67,8 +74,9 @@ export default {
         fillTemplate(vm.templates.nomination, 'nomination', details)
           .then(res => {
             vm.docs.nomination = {};
-            res.uri.then(uri => {
-              vm.docs.nomination.uri = uri;
+            res.pdf.then(pdf => {
+              vm.docs.nomination.uri = pdfToUri(pdf);
+              vm.docs.nomination.pdf = pdf;
               vm.docs.nomination.title = res.title;
             });
           });
@@ -78,8 +86,9 @@ export default {
         fillTemplate(vm.templates.memo, 'memo', details)
           .then(res => {
             vm.docs.memo = {};
-            res.uri.then(uri => {
-              vm.docs.memo.uri = uri;
+            res.pdf.then(pdf => {
+              vm.docs.memo.uri = pdfToUri(pdf);
+              vm.docs.memo.pdf = pdf;
               vm.docs.memo.title = res.title;
             });
           });
@@ -89,16 +98,24 @@ export default {
         fillTemplate(vm.templates.offer, 'offer', details)
           .then(res => {
             vm.docs.offer = [];
-            res.forEach(d => { vm.docs.offer.push(d); });
+            res.forEach(d => {
+              d.uri = pdfToUri(d.pdf);
+              vm.docs.offer.push(d);
+            });
           });
       }
 
       if (!(vm.errors.annex = allRequired(details, ['applicants', 'meeting', 'meetingDate', 'resultAnnouncementDate', 'councilPost', 'councilMember', 'companyName']))) {
-        fillTemplate(vm.templates.annex, 'annex', details).then(uris => {
-          vm.docs.annex = {};
-          for (let i = 0; i < details.applicants.length; i++) {
+        fillTemplate(vm.templates.annex, 'annex', details).then(res => {
+          vm.docs.annex = [];
+          res.forEach(d => {
+            d.uri = pdfToUri(d.pdf);
+            vm.docs.annex.push(d);
+          });
+
+          /* for (let i = 0; i < details.applicants.length; i++) {
             vm.docs.annex[details.applicants[i].name] = uris[i];
-          }
+          }*/
         });
       }
     }
