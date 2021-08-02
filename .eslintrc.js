@@ -18,6 +18,7 @@ module.exports = {
     'no-plusplus': ['error', { 'allowForLoopAfterthoughts': true }],
     'arrow-parens': ['error', 'as-needed'],
     'no-underscore-dangle': 'off',
-    'no-alert': 'off'
+    'no-alert': 'off',
+    'consistent-return': 'off'
   }
 };

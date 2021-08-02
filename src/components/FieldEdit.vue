@@ -156,58 +156,61 @@ export default {
 
       this.quota = this.applicants.length;
       return true;
+    },
+    loadConfig (obj) {
+      if (obj.meeting) {
+        this.meeting = obj.meeting;
+      }
+
+      if (obj.meetingDate) {
+        this.meetingDate = obj.meetingDate;
+      }
+
+      if (obj.sponsorship) {
+        this.sponsorship = obj.sponsorship;
+      }
+
+      if (obj.councilMember) {
+        this.councilMember = obj.councilMember;
+      }
+
+      if (obj.councilPost) {
+        this.councilPost = obj.councilPost;
+      }
+
+      if (obj.deadline) {
+        this.deadline = obj.deadline;
+      }
+
+      if (obj.resultAnnouncementDate) {
+        this.resultAnnouncementDate = obj.resultAnnouncementDate;
+      }
+
+      if (obj.companyName) {
+        this.companyName = obj.companyName;
+      }
+
+      if (obj.companyContact) {
+        this.companyContact = obj.companyContact;
+      }
+
+      if (obj.quota) {
+        this.quota = +obj.quota;
+      }
+
+      if (obj.applicants) {
+        const applicants = JSON.parse(obj.applicants);
+        while (applicants.length < this.quota) {
+          applicants.push({ department: 'Medicine and Geriatrics' });
+        }
+        this.applicants = applicants;
+      }
     }
   },
   mounted () {
     feather.replace();
 
-    if (localStorage.meeting) {
-      this.meeting = localStorage.meeting;
-    }
-
-    if (localStorage.meetingDate) {
-      this.meetingDate = localStorage.meetingDate;
-    }
-
-    if (localStorage.sponsorship) {
-      this.sponsorship = localStorage.sponsorship;
-    }
-
-    if (localStorage.councilMember) {
-      this.councilMember = localStorage.councilMember;
-    }
-
-    if (localStorage.councilPost) {
-      this.councilPost = localStorage.councilPost;
-    }
-
-    if (localStorage.deadline) {
-      this.deadline = localStorage.deadline;
-    }
-
-    if (localStorage.resultAnnouncementDate) {
-      this.resultAnnouncementDate = localStorage.resultAnnouncementDate;
-    }
-
-    if (localStorage.companyName) {
-      this.companyName = localStorage.companyName;
-    }
-
-    if (localStorage.companyContact) {
-      this.companyContact = localStorage.companyContact;
-    }
-
-    if (localStorage.quota) {
-      this.quota = +localStorage.quota;
-    }
-
-    if (localStorage.applicants) {
-      const applicants = JSON.parse(localStorage.applicants);
-      while (applicants.length < this.quota) {
-        applicants.push({ department: 'Medicine and Geriatrics' });
-      }
-      this.applicants = applicants;
-    }
+    this.loadConfig(localStorage);
 
     this.$watch('details.applicants', n => {
       localStorage.applicants = JSON.stringify(n);
