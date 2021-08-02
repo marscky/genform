@@ -13,6 +13,7 @@
            @click="download(docs[name].pdf, docs[name].title + '.pdf', 'application/pdf')"
            >download</a>
         <iframe width="100%" height="300px" :src="docs[name] && docs[name].uri"></iframe>
+        <blockquote @click="selectText" v-if="name === 'application'">{{emails.application}}</blockquote>
       </template>
       <template v-else-if="(name === 'offer' || name === 'annex') && docs[name]">
         <div v-for="(item, key) in docs[name]" :key="key">
@@ -41,6 +42,7 @@ export default {
       isTemplateReady: false,
       templates: {},
       docs: {},
+      emails: {},
       errors: {},
       objectURL: []
     };
@@ -50,6 +52,30 @@ export default {
     download (data, title, mimetype) {
       console.log(downloadjs);
       downloadjs(data, title, mimetype);
+    },
+    selectText (e) {
+      const node = e.target;
+      if (document.body.createTextRange) {
+        const range = document.body.createTextRange();
+        range.moveToElementText(node);
+        range.select();
+      } else if (window.getSelection) {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      } else {
+        console.warn('Could not select text in node: Unsupported browser.');
+      }
+    },
+    genEmail (type, details) {
+      const closing = `Dr. ${details.councilMember}\n${details.councilPost}\nRTSKHDA\nSession ${details.councilSession}`;
+
+      switch (type) {
+        case 'application':
+          this.emails.application = `Dear Members,\n\n${details.companyName} would like to sponsor ${details.quota} doctor from our association to attend the ${details.meeting} on ${details.meetingDate}. Please contact our council members if interested. Thank you.\n\nYours sincerely,\n${closing}`.replace(/\\n/g, '<br>');
+      }
     },
     genpdf (details) {
       const vm = this;
@@ -68,6 +94,8 @@ export default {
               vm.docs.application.title = res.title;
             });
           });
+
+        vm.genEmail('application', details);
       }
 
       if (!(vm.errors.nomination = allRequired(details, ['applicants', 'meeting', 'meetingDate', 'quota', 'sponsorship', 'deadline', 'resultAnnouncementDate', 'councilMember', 'councilPost']))) {
@@ -148,5 +176,11 @@ iframe {
 
 strong {
   margin-right: 1rem;
+}
+
+blockquote {
+  white-space: break-spaces;
+  word-break: break-word;
+  cursor: pointer;
 }
 </style>
