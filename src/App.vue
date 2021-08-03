@@ -117,6 +117,7 @@ header {
   font-size: unset;
   font-weight: unset;
   margin-bottom: unset;
+  cursor: pointer;
 }
 
 main.container {
