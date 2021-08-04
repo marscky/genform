@@ -182,6 +182,10 @@ export default {
         this.deadline = obj.deadline;
       }
 
+      if (obj.openApplicationDate) {
+        this.openApplicationDate = obj.openApplicationDate;
+      }
+
       if (obj.resultAnnouncementDate) {
         this.resultAnnouncementDate = obj.resultAnnouncementDate;
       }
