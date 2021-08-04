@@ -113,7 +113,7 @@ async function fillTemplate (template, name, details) {
         { type: 'deadline', text: details.deadline },
         { type: 'applicants', text: applicantText },
         { type: 'delegates', text: applicantText },
-        { type: 'resultAnnouncementDate', text: details.openApplicationDate },
+        { type: 'resultAnnouncementDate', text: details.resultAnnouncementDate },
         closing
       ]);
       break;
@@ -132,7 +132,7 @@ async function fillTemplate (template, name, details) {
       drawTexts(page, name, [
         { type: 'from', text: closing.text },
         { type: 'to', text: details.companyName },
-        { type: 'resultAnnouncementDate', text: details.openApplicationDate },
+        { type: 'resultAnnouncementDate', text: details.resultAnnouncementDate },
         { type: 'companyContact', text: details.companyContact },
         { type: 'body', text: `Dear Sir/Madam,\n \nOur association would like to nominate ${applicantText.slice(0, -2)} for ${details.meeting} on ${details.meetingDate}.\n \nThank you for your continuous support.\n \nBest regards,\n \n \n \n${closing.text}` }
       ]);
