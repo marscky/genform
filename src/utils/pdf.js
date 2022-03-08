@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, StandardFonts } from 'pdf-lib';
 
 const pdfAuthor = 'genform with pdf-lib';
 const drawTextOptions = {
   application: {
-    meeting: { x: 177.98, y: 703.65 },
+    meeting: { x: 177.98, y: 703.65, wrapWidth: 359.91 },
     meetingDate: { x: 177.98, y: 678.67 },
     sponsorship: { x: 177.98, y: 653.2 },
     quota: { x: 177.98, y: 627.33 },
@@ -13,7 +13,7 @@ const drawTextOptions = {
     closing: { x: 56.43, y: 183.15, lineHeight: 17 }
   },
   nomination: {
-    meeting: { x: 177.98, y: 703.65 },
+    meeting: { x: 177.98, y: 703.65, wrapWidth: 359.91 },
     meetingDate: { x: 177.98, y: 678.67 },
     sponsorship: { x: 177.98, y: 653.2 },
     quota: { x: 177.98, y: 627.33 },
@@ -27,7 +27,7 @@ const drawTextOptions = {
   offer: {
     applicant: { x: 206.5, y: 703.41 },
     sponsoringCompany: { x: 205.5, y: 678.09, maxWidth: 260 },
-    meeting: { x: 206.5, y: 653.3 },
+    meeting: { x: 206.5, y: 653.3, wrapWidth: 331.98 },
     meetingDate: { x: 206.5, y: 627.97 },
     sponsorship: { x: 206.5, y: 602.71 },
     resultAnnouncementDate: { x: 56.84, y: 483.89 },
@@ -42,7 +42,7 @@ const drawTextOptions = {
   },
   annex: {
     applicant: { x: 260.8, y: 695.07 },
-    meeting: { x: 260.8, y: 669.14 },
+    meeting: { x: 260.8, y: 669.14, wrapWidth: 277.09 },
     meetingDate: { x: 260.8, y: 643.29 },
     sponsoringCompany: { x: 246.05, y: 494.04 },
     closing: { x: 61.02, y: 214.71 },
@@ -50,11 +50,41 @@ const drawTextOptions = {
   }
 };
 
-function drawTexts (page, name, items) {
-  console.log(name);
+function drawTexts (page, name, items, font) {
   items.forEach(item => {
-    console.log('type', item.type, ' text', item.text);
-    page.drawText(''+item.text, drawTextOptions[name][item.type]);
+    const opts = drawTextOptions[name][item.type];
+
+    let fontSize = 11;
+    let y = opts.y;
+    let newText = '';
+    if (opts.wrapWidth !== undefined) {
+      const wrapWidth = opts.wrapWidth;
+      let currentParagraph = [];
+      const paragraphs = [currentParagraph];
+      item.text.split(' ').forEach(word => {
+        if (font.widthOfTextAtSize(
+              currentParagraph.concat(word).join(' '),
+              fontSize) > wrapWidth) {
+          currentParagraph = [word];
+          paragraphs.push(currentParagraph);
+        } else {
+          currentParagraph.push(word);
+        }
+      });
+      newText = paragraphs.map(paragraph => paragraph.join(' ')).join("\n");
+      if (paragraphs.length > 1) {
+        fontSize = 8.5;
+        y += 7.5;
+      }
+    } else if (opts.shrinkWidth !== undefined) {
+      while (font.widthOfTextAtSize(item.text, fontSize) > opts.shrinkWidth) {
+        fontSize -= 0.1;
+      }
+      console.log(fontSize);
+    }
+
+    page.drawText(newText.length === 0 ? ''+item.text : newText,
+                  { ...opts, size: fontSize, y });
   });
 }
 
@@ -65,6 +95,7 @@ function loadPDF (name) {
 
 async function fillTemplate (template, name, details) {
   const doc = await PDFDocument.load(template);
+  const font = await doc.embedFont(StandardFonts.Helvetica);
   const page = doc.getPages()[0];
   page.setFontSize(11);
   page.setLineHeight(12.1);
@@ -80,7 +111,7 @@ async function fillTemplate (template, name, details) {
 
   switch (name) {
     case 'application':
-      console.log(details.deadline);
+      // console.log(details.deadline);
       title = `[RTSKHDA] [${details.meeting}] - Application`;
       doc.setTitle(title, { showInWindowTitleBar: true });
       drawTexts(page, name, [
@@ -91,7 +122,7 @@ async function fillTemplate (template, name, details) {
         { type: 'deadline', text: details.deadline },
         { type: 'openApplicationDate', text: details.openApplicationDate },
         closing
-      ]);
+      ], font);
       break;
 
     case 'nomination': {
@@ -115,7 +146,7 @@ async function fillTemplate (template, name, details) {
         { type: 'delegates', text: applicantText },
         { type: 'resultAnnouncementDate', text: details.resultAnnouncementDate },
         closing
-      ]);
+      ], font);
       break;
     }
 
@@ -135,7 +166,7 @@ async function fillTemplate (template, name, details) {
         { type: 'resultAnnouncementDate', text: details.resultAnnouncementDate },
         { type: 'companyContact', text: details.companyContact },
         { type: 'body', text: `Dear Sir/Madam,\n \nOur association would like to nominate ${applicantText.slice(0, -2)} for ${details.meeting} on ${details.meetingDate}.\n \nThank you for your continuous support.\n \nBest regards,\n \n \n \n${closing.text}` }
-      ]);
+      ], font);
       break;
     }
 
@@ -160,7 +191,7 @@ async function fillTemplate (template, name, details) {
 
       title = `[RTSKHDA] [${details.meeting}] Offer - Dr. ${applicants[0].name}`;
       doc.setTitle(title, { showInWindowTitleBar: true });
-      drawTexts(page, name, baseItems.concat({ type: 'applicant', text: `${applicants[0].name}` }));
+      drawTexts(page, name, baseItems.concat({ type: 'applicant', text: `${applicants[0].name}` }), font);
       uris.push(doc.save());
       titles.push(title);
 
@@ -178,7 +209,7 @@ async function fillTemplate (template, name, details) {
           titles.push(title1);
           doc1.setTitle(title1, { showInWindowTitleBar: true });
 
-          drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `${applicants[i].name}` }));
+          drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `${applicants[i].name}` }), font);
           uris.push(doc1.save());
         }
       }
@@ -216,7 +247,7 @@ async function fillTemplate (template, name, details) {
 
       title = `[RTSKHDA] [${details.meeting}] Annex - Dr. ${applicants[0].name}`;
       doc.setTitle(title, { showInWindowTitleBar: true });
-      drawTexts(page, name, baseItems.concat({ type: 'applicant', text: `Dr. ${applicants[0].name}` }));
+      drawTexts(page, name, baseItems.concat({ type: 'applicant', text: `Dr. ${applicants[0].name}` }), font);
       uris.push(doc.save());
       titles.push(title);
 
@@ -233,7 +264,7 @@ async function fillTemplate (template, name, details) {
           let title1 = `[RTSKHDA] [${details.meeting}] Annex - Dr. ${applicants[i].name}`;
           titles.push(title1);
           doc1.setTitle(title1, { showInWindowTitleBar: true });
-          drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `Dr. ${applicants[i].name}` }));
+          drawTexts(page1, name, baseItems.concat({ type: 'applicant', text: `Dr. ${applicants[i].name}` }), font);
           uris.push(doc1.save());
         }
       }
