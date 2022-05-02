@@ -1,0 +1,11 @@
+node_modules/
+dist/
+
+# vim files
+.cache/
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+
+# system files
+.DS_Store
+

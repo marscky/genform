@@ -1,0 +1,28 @@
+{
+  "name": "genform",
+  "version": "1.0.0",
+  "description": "generate forms for DA sponsorships",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "parcel index.html",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marscky/genform.git"
+  },
+  "author": "marscky (https://github.com/marscky)",
+  "license": "UNLICENSED",
+  "private": "true",
+  "homepage": "https://github.com/marscky/genform#readme",
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.17.10",
+    "@babel/preset-env": "^7.17.10",
+    "jest": "^28.0.3"
+  }
+}
