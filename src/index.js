@@ -2,7 +2,7 @@ import { Router } from './router';
 
 console.log('hello world');
 
-const router = new Router({ ignoreTrailingSlash: true });
+const router = new Router();
 
 router.add('/', function() {
   console.log('root');
@@ -17,4 +17,4 @@ router.add('/form/:id/pdf', function({ id }) {
   console.log('form/pdf', id);
 });
 
-router.startUrlListener();
+router.start();

@@ -1,83 +1,82 @@
 import { pathToRegex } from './utils/path-to-regex';
 
 /**
- * Match target to a path and call correspnoding handler
- * Executes in the context of a Router instance
- * @param {string} target - the current path being navigated to
- */
-function matchPath(target) {
-  // find the first match to target and call handler
-  // Array#find returns undefined if no route can be matched
-  const matchedRoute = Object.values(this.paths)
-    .find(({ handler, matcher }) => {
-      const found = target.match(matcher);
-      if (found) {
-        // found.groups contains the named capturing groups for parameters 
-        handler(found.groups);
-        return true;
-      }
-    });
-
-  if (!matchedRoute) {
-    this.notFound(target);
-  }
-}
-
-/**
  * Simple router for single page application
- * Hashed url are used for paths
+ *
+ * Hashed urls are used for paths
+ * Paths format
+ * - pattern matching in path is not supported
+ * - paths are matched in a case-sensitive manner
+ * - paths are matched literally except for parts with specified parameters
+ * - no pattern matching is available for parameters, the only requirement
+ *   for matching a parameter in a path is that it must not be empty
+ * - paramaters are specified by prefixing the parameter name with a colon
+ *   e.g. /user/:id, /post/:postId
  */
 export class Router {
   /*
    * Create a new instance of Router
    * @param {object} [options]
-   * @param {array} [options.paths] array of objects with path and handler 
-   *    as specified in #add()
-   * @param {function(path: string)} [options.notFound] handler when a path 
-   *    is not matched
-   * @param {boolean} [options.ignoreTrailingSlash] specify whether paths
-   *    with trailing slash will be treated as path without
-   * @constructor
+   * @param {array} [options.paths] - array of objects with path and handler 
+   *     as specified in #add()
+   * @param {function(path: string)} [options.notFound] - handler when a path 
+   *     is not matched
    */
-  constructor({ paths, notFound, ignoreTrailingSlash=true }={}) {
+  constructor({ paths, notFound }={}) {
     this.paths = {};
-
-    this.ignoreTrailingSlash = ignoreTrailingSlash;
-
-    if (paths && paths.forEach) {
+    if (paths instanceof Array) {
       paths.forEach(p => this.add(p.path, p.handler));
     }
 
-    Object.defineProperty(this, 'notFound', {
-      value: typeof notFound === 'function' 
-        ? notFound
-        : (path) => { console.error('no matching route found', path) },
-      enumerable: true
-    });
+    this.notFound = notFound || (path => { console.error('no matching route found', path) });
   }
 
   /**
    * Add a path and the corresponding handler
-   * Expect a path to be specified once only, otherwise will throw an error.
+   *
+   * If an identical path is added again, the existing handler will be overwritten
    * @param {string} path
-   * @param {function([params: object])} handler - if params are specified in 
-   *  path, they will be passed into the handler in the form of key-value pairs
-   * @throws {Error} A path can only be specified once only.
+   * @param {function([params: object])} handler - if parameterss are specified in 
+   *     path, a params object is passed into the handler
    */
   add(path, handler) {
-    if (this.paths[path]) {
-      throw new Error('A path can only be specified once only', path);
-    }
-
     this.paths[path] = {
       handler,
-      matcher: pathToRegex(path)
+      rgx: pathToRegex(path)
     };
   }
 
   /**
-   * Navigate to path, shorthand for setting window.location.hash
-   * The hash will be prepended  
+   * Match current path and invoke corresponding handler if found
+   * If no matching path is found, the notFound handler will be invoked
+   * @param {string} path
+   */
+  matchPath(path) {
+    // find the first match to target and call handler
+    // Array#find returns undefined if no route can be matched
+    const matchedPath = Object.values(this.paths)
+      .find(({ handler, rgx }) => {
+        const found = path.match(rgx);
+        if (found) {
+          // found.groups contains the named capturing groups for parameters
+          // undefined if no parameter is specified in the path
+          handler(found.groups);
+
+          // end Array#find
+          return true;
+        }
+      });
+
+    if (!matchedPath) {
+      this.notFound(path);
+    }
+  }
+
+  /**
+   * Navigate to path
+   *
+   * When setting location.hash, the hash will be prepended automatically
+   * with a '#' if it does not start with one, e.g. '/abc' => '#/abc'
    * @param {string} path
    */
   navigateTo(path) {
@@ -85,37 +84,43 @@ export class Router {
   }
 
   /**
-   * Start listening to onhashchange event
+   * Start the router by listening to hashchange event
    *
-   * Once it is called, it will set a nonmodifiable property isListening
-   * to indicate that this function is called
+   * @throws {Error} If it is called when the router has started already
    */
-  startUrlListener() {
-    if (this.isListening) {
-      return;
-    } else {
-      Object.defineProperty(this, 'isListening', { value: true });
-    }
-
-    const $ctx = this;
-
-    window.addEventListener('hashchange', () => {
+  start() {
+    function _listener () {
       if (window.location.hash.length === 0) {
         // empty hash: navigate to root
         this.navigateTo('/');
       } else {
-        // the string will contain hash as the first character
-        let path = window.location.hash.slice(1);
-        if (this.ignoreTrailingSlash
-            && path.length !== 1 
-            && path[path.length-1] === '/') {
-          path = path.slice(0, path.length-1);
-        }
-        matchPath.call($ctx, path);
+        // the string will contain the # character as the first character
+        const path = window.location.hash.slice(1);
+        this.matchPath(path);
       }
-    });
+    }
+
+    if (this.listener) {
+      throw new Error('Already listening to hashchange!');
+    }
+
+    const listener = _listener.bind(this);
+    window.addEventListener('hashchange', listener);
+
+    // save attached listener so that we can remove it later
+    this.listener = listener;
 
     // allow correct route on initial page load by triggering the event
     window.dispatchEvent(new window.HashChangeEvent('hashchange'));
+  }
+
+  /**
+   * Stop the router
+   */
+  stop() {
+    if (this.listener) {
+      window.removeEventListener(this.listener);
+      delete this.listener;
+    }
   }
 }
