@@ -1,14 +1,13 @@
 import { Router } from './router';
-
-console.log('hello world');
+import { App } from '../app';
+import { FormView } from './views/form-view';
 
 const router = new Router();
+const app = new App(document.getElementById('page'));
 
 router.redirect('/', '/new');
 
-router.add('/new', function () {
-  console.log('new');
-});
+router.add('/new', app.use(FormView));
 router.add('/browse', function() {
   console.log('browse');
 });
