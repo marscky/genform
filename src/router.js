@@ -48,6 +48,7 @@ export class Router {
 
   /**
    * Match current path and invoke corresponding handler if found
+   *
    * If no matching path is found, the notFound handler will be invoked
    * @param {string} path
    */
@@ -81,6 +82,22 @@ export class Router {
    */
   navigateTo(path) {
     window.location.hash = path;
+  }
+
+  /**
+   * Set up redirect
+   *
+   * Both paths are literal, parameters are not supported
+   * @param {string} from
+   * @param {string} to
+   */
+  redirect(from, to) {
+    this.paths[from] = {
+      handler () {
+        window.location.hash = to;
+      },
+      rgx: pathToRegex(from)
+    };
   }
 
   /**

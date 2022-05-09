@@ -4,8 +4,10 @@ console.log('hello world');
 
 const router = new Router();
 
-router.add('/', function() {
-  console.log('root');
+router.redirect('/', '/new');
+
+router.add('/new', function () {
+  console.log('new');
 });
 router.add('/browse', function() {
   console.log('browse');
