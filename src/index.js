@@ -1,5 +1,5 @@
 import { Router } from './router';
-import { App } from '../app';
+import { App } from './app';
 import { FormView } from './views/form-view';
 
 const router = new Router();
