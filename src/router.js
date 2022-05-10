@@ -17,9 +17,9 @@ export class Router {
   /*
    * Create a new instance of Router
    * @param {object} [options]
-   * @param {array} [options.paths] - array of objects with path and handler 
+   * @param {array} [options.paths] - array of objects with path and handler
    *     as specified in #add()
-   * @param {function(path: string)} [options.notFound] - handler when a path 
+   * @param {function(path: string)} [options.notFound] - handler when a path
    *     is not matched
    */
   constructor({ paths, notFound }={}) {
@@ -36,7 +36,7 @@ export class Router {
    *
    * If an identical path is added again, the existing handler will be overwritten
    * @param {string} path
-   * @param {function([params: object])} handler - if parameterss are specified in 
+   * @param {function([params: object])} handler - if parameterss are specified in
    *     path, a params object is passed into the handler
    */
   add(path, handler) {
@@ -94,7 +94,14 @@ export class Router {
   redirect(from, to) {
     this.paths[from] = {
       handler () {
-        window.location.hash = to;
+        // replaceState is necessary to remove the `from` path from history
+        // if location.hash is set directly with redirect, the user will always
+        // go back to the `from` path on page backwards, and be redirected to
+        // the `to` path, i.e. the user can never navigate backwards
+        window.history.replaceState(null, null, '#'+to);
+
+        // replaceState does not trigger hashchange event
+        window.dispatchEvent(new window.HashChangeEvent('hashchange'));
       },
       rgx: pathToRegex(from)
     };
@@ -109,12 +116,13 @@ export class Router {
     function _listener () {
       if (window.location.hash.length === 0) {
         // empty hash: navigate to root
-        this.navigateTo('/');
-      } else {
-        // the string will contain the # character as the first character
-        const path = window.location.hash.slice(1);
-        this.matchPath(path);
+        // similar to a redirect, replaceState allows user to navigate backwards
+        window.history.replaceState(null, null, '#/');
       }
+
+      // the string will contain the # character as the first character
+      const path = window.location.hash.slice(1);
+      this.matchPath(path);
     }
 
     if (this.listener) {
