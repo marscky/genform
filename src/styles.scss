@@ -54,6 +54,14 @@ body {
       color: $fgColor;
       text-decoration: none;
     }
+
+    label {
+      cursor: pointer;
+    }
+
+    label + input[type="file"] {
+      display: none;
+    }
   }
 }
 
