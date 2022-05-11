@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+$baseColor: #152028;
+$bgColor: #233d55;
+$fgColor: #bdbdc3;
+$bgColor_hover: #0f3446;
+
+$appWidth: 760px;
+$padding_v: 10px;
+
+body {
+  background-color: $baseColor;
+  color: $fgColor;
+  font-family: Inter, 'Source Sans Pro', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+#app {
+  margin: 0 auto;
+  width: $appWidth;
+}
+
+#navbar {
+  background-color: $bgColor;
+  box-shadow: #0e1011 0 5px;
+  height: calc(1.5em + $padding_v * 2);
+  position: fixed;
+  top: 0;
+  width: $appWidth;
+
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    list-style-type: none;
+    display: inline-block;
+    padding: $padding_v 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: $bgColor_hover;
+    }
+
+    a {
+      color: $fgColor;
+      text-decoration: none;
+    }
+  }
+}
+
+#page {
+  margin-top: calc(1.5em + $padding_v * 2 + 1.5em);
+  width: $appWidth;
+}
+
+.form {
+  > h3 {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin: 1.8em 0 1em 0;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
+  }
+
+  .form-input {
+    $inputBg: #1c2f47;
+
+    display: block;
+    margin-bottom: 1.3em;
+
+    label {
+      display: block;
+      margin-bottom: 0.5em;
+    }
+
+    input,
+    select {
+      background-color: $inputBg;
+      border: none;
+      border-radius: 4px;
+      color: #b5b5bd;
+      font-family: inherit;
+      font-size: inherit;
+      margin: 0;
+      padding: 10px 6px;
+      width: 100%;
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import './styles.scss';
 import { Router } from './router';
 import { App } from './app';
 import { FormView } from './views/form-view';
