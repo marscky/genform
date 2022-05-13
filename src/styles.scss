@@ -7,7 +7,8 @@
 $baseColor: #152028;
 $bgColor: #233d55;
 $fgColor: #bdbdc3;
-$bgColor_hover: #0f3446;
+$bgColor_hover: #2f2f64;
+$bgColor_active: #0f3446;
 
 $appWidth: 760px;
 $padding_v: 10px;
@@ -42,49 +43,49 @@ body {
   li {
     list-style-type: none;
     display: inline-block;
-    cursor: pointer;
 
-    a {
+    @mixin navbar_item {
       color: $fgColor;
+      cursor: pointer;
       display: inline-block;
       padding: $padding_v 15px;
       text-decoration: none;
       transition: all 0.2s ease;
 
       &:hover {
-        background-color: #2f2f64;
+        background-color: $bgColor_hover;
       }
 
       &:active {
-        background-color: $bgColor_hover;
+        background-color: $bgColor_active;
       }
     }
 
+    a {
+      @include navbar_item();
+    }
+
+    /*  styling the <input type="file"> element
+     *  https://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-way/
+     */
     input[type="file"] {
-      border: 0;
-      clip: rect(0, 0, 0, 0);
-      height: 1px;
+      height: 0.1px;
+      opacity: 0;
       overflow: hidden;
-      padding: 0;
       position: absolute !important;
-      white-space: nowrap;
-      width: 1px;
+      width: 0.1px;
+      z-index: -1;
 
       & + label {
-        color: $fgColor;
-        display: inline-block;
-        padding: $padding_v 15px;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        cursor: pointer;
+        @include navbar_item();
+      }
 
-        &:hover {
-          background-color: #2f2f64;
-        }
-
-        &:active {
-          background-color: $bgColor_hover;
-        }
+      &:focus + label {
+        /* when input is focussed, use browser focus style on the label
+         * https://remysharp.com/til/css/focus-ring-default-styles
+         */
+        outline: 5px auto Highlight;
+        outline: 5px auto -webkit-focus-ring-color;
       }
     }
   }
