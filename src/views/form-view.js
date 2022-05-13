@@ -86,6 +86,7 @@ export class FormView {
       </span>
 
       <h3>Applicants</h3>
+      <span class="applicant-group">
       <span class="form-input">
         <label for="applicant-name">Name</label
         ><input type="text" name="applicant-name" id="applicant-name" />
@@ -96,6 +97,7 @@ export class FormView {
           <option value="med">Medicine and Geriatrics</option>
           <option value="surg">Surgery</option>
         </select>
+      </span>
       </span>
     </form>
     `;

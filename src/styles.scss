@@ -131,4 +131,18 @@ body {
       width: 100%;
     }
   }
+
+  .applicant-group {
+    counter-reset: applicant-num;
+    display: block;
+    position: relative;
+
+    &::before {
+      counter-increment: applicant-num;
+      content: counter(applicant-num);
+      position: absolute;
+      left: -1.2em;
+      top: 0;
+    }
+  }
 }
