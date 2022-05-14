@@ -1,9 +1,35 @@
 export class FormView {
   constructor(state={}) {
     this.state = state;
+    this.methods = {
+      getApplicantHtml (quota) {
+        let html = '';
+        for (let i = 0; i < quota; i++) {
+          html += `
+          <span class="applicant-group">
+            <span class="form-input">
+            <label for="applicant-name">Name</label
+            ><input type="text" name="applicant-name" id="applicant-name" />
+            </span>
+            <span class="form-input">
+              <label for="applicant-dept">Department</label
+              ><select name="applicant-dept" id="applicant-dept" class="select-css">
+                <option value="med">Medicine and Geriatrics</option>
+                <option value="surg">Surgery</option>
+              </select>
+            </span>
+          </span>
+          `;
+        }
+        return html;
+      }
+    };
   }
+
   render() {
     const params = this.state.params;
+    const quota = params ? 1 : 2;
+
     const html = `
     <form class="form" id="gf-form">
       <h3>Council member</h3>
@@ -86,26 +112,23 @@ export class FormView {
       </span>
 
       <h3>Applicants</h3>
-      <span class="applicant-group">
-      <span class="form-input">
-        <label for="applicant-name">Name</label
-        ><input type="text" name="applicant-name" id="applicant-name" />
-      </span>
-      <span class="form-input">
-        <label for="applicant-dept">Department</label
-        ><select name="applicant-dept" id="applicant-dept" class="select-css">
-          <option value="med">Medicine and Geriatrics</option>
-          <option value="surg">Surgery</option>
-        </select>
-      </span>
-      </span>
+      <span class="applicant-groups">${this.methods.getApplicantHtml(quota)}</span>
     </form>
     `;
 
     return html;
     // return '<h1>form</h1>' + (params ? 'id: '+params.id : 'new form');
   }
+
   onLoad() {
     console.log('form loaded');
+    this.listener = function (e) {
+      console.log(e.target.value);
+    };
+    document.querySelector('input[name="meeting-quota"]').addEventListener('change', this.listener);
+  }
+
+  beforeUnload () {
+    document.querySelector('input[name="meeting-quota"]').removeEventListener('change', this.listener);
   }
 }
