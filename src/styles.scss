@@ -133,7 +133,10 @@ body {
   }
 
   .applicant-group {
-    counter-reset: applicant-num;
+    &:first-child {
+      counter-reset: applicant-num;
+    }
+
     display: block;
     position: relative;
 
@@ -143,6 +146,15 @@ body {
       position: absolute;
       left: -1.2em;
       top: 0;
+    }
+
+    &:not(:last-child)::after {
+      background-color: #bdbdc32b;
+      content: '';
+      display: block;
+      height: 2px;
+      margin: 1.8em auto 1em auto;
+      width: 50%;
     }
   }
 }
