@@ -1,3 +1,4 @@
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import './styles.scss';
 import { Router } from './router';
 import { App } from './app';
