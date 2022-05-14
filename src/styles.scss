@@ -13,6 +13,8 @@ $bgColor_active: #0f3446;
 $appWidth: 760px;
 $padding_v: 10px;
 
+$breakpoint: 860px;
+
 body {
   background-color: $baseColor;
   color: $fgColor;
@@ -155,6 +157,33 @@ body {
       height: 2px;
       margin: 1.8em auto 1em auto;
       width: 50%;
+    }
+  }
+}
+
+@media (max-width: $breakpoint) {
+  #app {
+    width: 100%;
+  }
+
+  #navbar {
+    width: 100%;
+  }
+
+  #page {
+    padding: 0 1em;
+    width: 100%;
+  }
+
+  .form {
+    .applicant-group {
+      &::before {
+        display: none;
+      }
+
+      &:not(:last-child)::after {
+        width: 100%;
+      }
     }
   }
 }
