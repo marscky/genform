@@ -13,7 +13,7 @@ $bgColor_active: #0f3446;
 $appWidth: 760px;
 $padding_v: 10px;
 
-$breakpoint: 860px;
+$breakpoint: 760px;
 
 body {
   background-color: $baseColor;
@@ -36,6 +36,11 @@ body {
   position: fixed;
   top: 0;
   width: $appWidth;
+  z-index: 99999;
+
+  .navbar-toggle, input[type="checkbox"] {
+    display: none;
+  }
 
   ul {
     margin: 0;
@@ -94,7 +99,7 @@ body {
 }
 
 #page {
-  margin-top: calc(1.5em + $padding_v * 2 + 1.5em);
+  padding-top: calc(1.5em + $padding_v * 2 + 1.5em);
   width: $appWidth;
 }
 
@@ -171,7 +176,8 @@ body {
   }
 
   #page {
-    padding: 0 1em;
+    padding-left: 1em;
+    padding-right: 1em;
     width: 100%;
   }
 
@@ -183,6 +189,57 @@ body {
 
       &:not(:last-child)::after {
         width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  #app {
+    /* necessary for overflow: hidden to lock body scroll when navbar is open */
+    height: 100vh;
+
+    &.navbar-open {
+      overflow: hidden;
+
+      #navbar {
+        height: 100vh;
+      }
+    }
+  }
+
+
+  #navbar {
+    .navbar-toggle {
+      display: block;
+      padding: 8px 1em 8px 0;
+      text-align: right;
+      font-size: 1.2em;
+
+      label {
+        cursor: pointer;
+      }
+    }
+
+    input[type="checkbox"] {
+      &:checked + ul {
+        display: block;
+      }
+    }
+
+    ul {
+      display: none;
+    }
+
+    li {
+      display: block;
+
+      a, input[type="file"] + label {
+        display: block;
+
+        i {
+          margin-right: 0.8em;;
+        }
       }
     }
   }

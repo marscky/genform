@@ -21,3 +21,7 @@ router.add('/form/:id/pdf', function({ id }) {
 });
 
 router.start();
+
+document.querySelector('#navbar-toggle').addEventListener('change', function (e) {
+  document.getElementById('app').classList.toggle('navbar-open', e.target.checked);
+});
