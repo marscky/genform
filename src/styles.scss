@@ -116,6 +116,7 @@ body {
 
   .form-input {
     $inputBg: #1c2f47;
+    $input-row-pad-v: 10px;
 
     display: block;
     margin-bottom: 1.3em;
@@ -134,12 +135,42 @@ body {
       font-family: inherit;
       font-size: inherit;
       margin: 0;
-      padding: 10px 6px;
+      padding: $input-row-pad-v 6px;
       width: 100%;
+    }
+
+    input[name="meeting-quota"] {
+      display: none;
+    }
+
+    .input-row {
+      display: inline-block;
+      padding: $input-row-pad-v 0;
+    }
+
+    .btn-bi {
+      background: none;
+      border: none;
+      color: $fgColor;
+      cursor: pointer;
+      font-size: inherit;
+      line-height: inherit;;
+      margin: 0;
+      padding: 0;
+
+      &:disabled {
+        color: #adadadbd;
+        cursor: not-allowed;
+      }
+    }
+
+    .meeting-quota-display {
+      display: inline-block;
+      margin: 0 1em;
     }
   }
 
-  .applicant-group {
+    .applicant-group {
     &:first-child {
       counter-reset: applicant-num;
     }
