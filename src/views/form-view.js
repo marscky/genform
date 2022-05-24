@@ -1,6 +1,5 @@
 export class FormView {
   constructor(state={}) {
-    this.els = {};
     this.listeners = [];
     this.state = state;
     this.methods = {
@@ -135,7 +134,7 @@ export class FormView {
     let applicantGroupsEl = document.querySelector('.applicant-groups');
     let applicantNamesInput = document.getElementsByName('applicant-name');
     let deptInput = document.getElementsByName('applicant-dept');
- 
+
     /**
      * Determine status of minus quota button
      * If quota is one only, it is disabled
@@ -221,10 +220,8 @@ export class FormView {
   }
 
   beforeUnload () {
-    document.querySelector('input[name="meeting-quota"]').removeEventListener('change', this.listener);
-    this.listeners.forEach(listeners => {
-      const el = listeners[0];
-      listeners.slice(1).forEach(listener => el.removeEventListener(listener[0], listener[1]));
+    this.listeners.forEach(([el, inputType, listener]) => {
+      el.removeEventListener(inputType, listener);
     });
   }
 }
