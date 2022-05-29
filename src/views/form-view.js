@@ -128,6 +128,8 @@ export class FormView {
   onLoad() {
     let ctx = this;
 
+    let form = document.getElementById('gf-form');
+
     let quotaInput = document.getElementsByName('meeting-quota')[0];
     let quotaDisplay = document.querySelector('.meeting-quota-display');
     let quotaMinusBtn = document.querySelector('.btn-quota-minus');
@@ -215,6 +217,13 @@ export class FormView {
       document.querySelector('.applicant-groups'),
       'input',
       updateMinusBtn
+    );
+
+    this.addEventListener(
+      document.querySelector('.btn-genform'),
+      'click',
+      function () {
+      }
     );
 
     // should be called after form data is loaded
