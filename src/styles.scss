@@ -197,6 +197,24 @@ body {
   }
 }
 
+.btn-genform {
+   background-color: #286197;
+   border: none;
+   box-shadow: 0 5px #1c4078;
+   border-radius: 4px;
+   color: #dedee2;
+   cursor: pointer;
+   font-size: inherit;
+   line-height: inherit;
+   margin: 1.8em 0;
+   padding: 0.6em 1em;
+
+   &:active {
+     transform: translateY(2px);
+     box-shadow: none;
+   }
+}
+
 @media (max-width: $breakpoint) {
   #app {
     width: 100%;

@@ -118,6 +118,8 @@ export class FormView {
       <h3>Applicants</h3>
       <span class="applicant-groups">${this.methods.getApplicantHtml(quota)}</span>
     </form>
+
+    <button type="button" class="btn-genform">Generate form</button>
     `;
 
     return html;
