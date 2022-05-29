@@ -223,6 +223,19 @@ export class FormView {
       document.querySelector('.btn-genform'),
       'click',
       function () {
+        const required = ['council-member', 'council-post', 'council-session',
+                          'meeting-name', 'meeting-date', 'meeting-quota',
+                          'meeting-sponsorship', 'sponsor-name', 'sponsor-contact',
+                          'date-open', 'date-close', 'date-result'];
+
+        const missing = required.filter(name => {
+          return form.elements.namedItem(name).value.length === 0;
+        });
+
+        if (missing.length > 0) {
+          alert('Some fields are missing:\n' + missing.join('\n'))
+          return;
+        }
       }
     );
 
