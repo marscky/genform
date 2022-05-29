@@ -3,18 +3,18 @@ export class FormView {
     this.listeners = [];
     this.state = state;
     this.methods = {
-      getApplicantHtml (quota) {
+      getApplicantHtml (quota, startIndex=0) {
         let html = '';
         for (let i = 0; i < quota; i++) {
           html += `
           <span class="applicant-group">
             <span class="form-input">
-            <label for="applicant-name-${i+1}">Name</label
-            ><input type="text" name="applicant-name" id="applicant-name-${i+1}" />
+            <label for="applicant-name-${i+1+startIndex}">Name</label
+            ><input type="text" name="applicant-name" id="applicant-name-${i+1+startIndex}" />
             </span>
             <span class="form-input">
-              <label for="applicant-dept-${i+1}">Department</label
-              ><select name="applicant-dept" id="applicant-dept-${i+1}">
+              <label for="applicant-dept-${i+1+startIndex}">Department</label
+              ><select name="applicant-dept" id="applicant-dept-${i+1+startIndex}">
                 <option value="med">Medicine and Geriatrics</option>
                 <option value="surg">Surgery</option>
               </select>
@@ -169,7 +169,7 @@ export class FormView {
 
         // append new applicant group
         const wrapper = document.createElement('span');
-        wrapper.innerHTML = ctx.methods.getApplicantHtml(1);
+        wrapper.innerHTML = ctx.methods.getApplicantHtml(1, quotaInput.value-1);
 
         const applicantGroup = document.createElement('span');
         applicantGroup.className = 'applicant-group';
